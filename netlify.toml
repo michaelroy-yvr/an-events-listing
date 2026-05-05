@@ -6,7 +6,7 @@
   NODE_VERSION = "22"
 
 [functions]
-  node_bundler = "none"
+  node_bundler = "esbuild"
 
 [[redirects]]
   from = "/api/events"

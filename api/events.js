@@ -10,13 +10,9 @@
  *   limit    — max number of events to return
  */
 
-import { readFileSync } from 'fs';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
+// eslint-disable-next-line import/no-unresolved
+import config from '../config/listings.json' assert { type: 'json' };
 import { fetchListing } from '../scripts/fetch-events.js';
-
-const _dir  = dirname(fileURLToPath(import.meta.url));
-const _root = join(_dir, '..');
 
 // ─── In-memory cache ──────────────────────────────────────────────────────────
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
@@ -31,15 +27,6 @@ function getCached(key) {
 
 function setCached(key, data) {
   cache.set(key, { data, expiresAt: Date.now() + CACHE_TTL_MS });
-}
-
-// ─── Config loader ────────────────────────────────────────────────────────────
-let _config = null;
-function getConfig() {
-  if (!_config) {
-    _config = JSON.parse(readFileSync(join(_root, 'config', 'listings.json'), 'utf8'));
-  }
-  return _config;
 }
 
 // ─── Handler (Netlify) ────────────────────────────────────────────────────────
@@ -62,7 +49,6 @@ async function handleRequest(params) {
     return jsonResponse(500, { error: 'Server configuration error: missing API key.' });
   }
 
-  const config = getConfig();
   const listingName = params.listing ?? 'all-upcoming';
   const listingConfig = config.listings[listingName];
 
@@ -79,9 +65,7 @@ async function handleRequest(params) {
 
   const cacheKey = `${listingName}:${JSON.stringify(filters)}`;
   const cached = getCached(cacheKey);
-  if (cached) {
-    return jsonResponse(200, cached, { 'X-Cache': 'HIT' });
-  }
+  if (cached) return jsonResponse(200, cached, { 'X-Cache': 'HIT' });
 
   try {
     const events = await fetchListing(apiKey, filters);
