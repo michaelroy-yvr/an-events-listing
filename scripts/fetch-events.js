@@ -213,7 +213,7 @@ async function main() {
 }
 
 // Only run CLI when invoked directly
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
+if (import.meta.url && process.argv[1] === fileURLToPath(import.meta.url)) {
   main().catch((err) => {
     console.error(err);
     process.exit(1);
