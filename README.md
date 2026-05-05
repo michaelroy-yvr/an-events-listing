@@ -14,6 +14,13 @@ Visitor → iframe → Netlify Function → Action Network API
 
 ## Deploy to Netlify
 
+### One-click deploy
+
+When using one-click deploy, you'll be prompted to login to Github. If you don't have an account, you can [create one for free](https://github.com/).
+You will also be prompted to enter your [Action Network API Key](https://actionnetwork.org/docs/v2/#api-keys). You'll need a [paid account (Movement or higher)](https://actionnetwork.org/get-started) to access the API.
+
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/michaelroy-yvr/an-events-listing#ACTION_NETWORK_API_KEY)
+
 ### 1. Fork or clone this repo
 
 ```bash
