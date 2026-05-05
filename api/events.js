@@ -13,10 +13,8 @@
  * Vercel:  this file path /api/events.js is auto-detected as a serverless function
  */
 
-import { createRequire } from 'module';
 import { fetchListing } from '../scripts/fetch-events.js';
-
-const _require = createRequire(import.meta.url);
+import configData from '../config/listings.json' with { type: 'json' };
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
@@ -40,12 +38,8 @@ function setCached(key, data) {
 }
 
 // ─── Config loader ────────────────────────────────────────────────────────────
-let _config = null;
 function getConfig() {
-  if (!_config) {
-    _config = _require('../config/listings.json');
-  }
-  return _config;
+  return configData;
 }
 
 // ─── Handler (Netlify) ────────────────────────────────────────────────────────
