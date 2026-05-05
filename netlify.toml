@@ -5,6 +5,9 @@
 [build.environment]
   NODE_VERSION = "22"
 
+[functions]
+  node_bundler = "none"
+
 [[redirects]]
   from = "/api/events"
   to = "/.netlify/functions/events"

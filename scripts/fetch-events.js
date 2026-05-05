@@ -14,9 +14,6 @@ import { readFileSync, mkdirSync, writeFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const ROOT = join(__dirname, '..');
-
 const AN_API_BASE = 'https://actionnetwork.org/api/v2';
 
 /**
@@ -157,6 +154,7 @@ export async function fetchListing(apiKey, filters = {}) {
 // ─── CLI entry point ──────────────────────────────────────────────────────────
 
 async function main() {
+  const _root = join(dirname(fileURLToPath(import.meta.url)), '..');
   const args = process.argv.slice(2);
   const apiKey = process.env.ACTION_NETWORK_API_KEY;
 
@@ -167,7 +165,7 @@ async function main() {
   }
 
   // Load config
-  const configPath = join(ROOT, 'config', 'listings.json');
+  const configPath = join(_root, 'config', 'listings.json');
   const config = JSON.parse(readFileSync(configPath, 'utf8'));
 
   const fetchAll = args.includes('--all');
@@ -176,13 +174,13 @@ async function main() {
 
   if (fetchAll) {
     // Fetch all listings and write to data/
-    mkdirSync(join(ROOT, 'data'), { recursive: true });
+    mkdirSync(join(_root, 'data'), { recursive: true });
     for (const [name, listing] of Object.entries(config.listings)) {
       console.log(`Fetching listing: ${name}...`);
       try {
         const events = await fetchListing(apiKey, listing.filters ?? {});
         const output = { listing: name, title: listing.title, updated_at: new Date().toISOString(), events };
-        const outPath = join(ROOT, 'data', `${name}.json`);
+        const outPath = join(_root, 'data', `${name}.json`);
         writeFileSync(outPath, JSON.stringify(output, null, 2));
         console.log(`  -> ${events.length} events written to data/${name}.json`);
       } catch (err) {

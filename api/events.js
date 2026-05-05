@@ -8,28 +8,24 @@
  *   campaign — override event_campaign_id filter
  *   tags     — comma-separated tag names to filter by
  *   limit    — max number of events to return
- *
- * Netlify: place in /netlify/functions/events.js or use redirect to /api/events
- * Vercel:  this file path /api/events.js is auto-detected as a serverless function
  */
 
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 import { fetchListing } from '../scripts/fetch-events.js';
-import configData from '../config/listings.json' with { type: 'json' };
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const ROOT = join(__dirname, '..');
+const _dir  = dirname(fileURLToPath(import.meta.url));
+const _root = join(_dir, '..');
 
 // ─── In-memory cache ──────────────────────────────────────────────────────────
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
-const cache = new Map(); // key -> { data, expiresAt }
+const cache = new Map();
 
 function getCached(key) {
   const entry = cache.get(key);
   if (!entry) return null;
-  if (Date.now() > entry.expiresAt) {
-    cache.delete(key);
-    return null;
-  }
+  if (Date.now() > entry.expiresAt) { cache.delete(key); return null; }
   return entry.data;
 }
 
@@ -38,8 +34,12 @@ function setCached(key, data) {
 }
 
 // ─── Config loader ────────────────────────────────────────────────────────────
+let _config = null;
 function getConfig() {
-  return configData;
+  if (!_config) {
+    _config = JSON.parse(readFileSync(join(_root, 'config', 'listings.json'), 'utf8'));
+  }
+  return _config;
 }
 
 // ─── Handler (Netlify) ────────────────────────────────────────────────────────
@@ -49,8 +49,7 @@ export async function handler(event) {
 
 // ─── Handler (Vercel) ─────────────────────────────────────────────────────────
 export default async function vercelHandler(req, res) {
-  const params = req.query ?? {};
-  const result = await handleRequest(params);
+  const result = await handleRequest(req.query ?? {});
   res.setHeader('Content-Type', 'application/json');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.status(result.statusCode).send(result.body);
@@ -73,11 +72,10 @@ async function handleRequest(params) {
     });
   }
 
-  // Merge config filters with query-param overrides
   const filters = { ...(listingConfig.filters ?? {}) };
   if (params.campaign) filters.event_campaign_id = params.campaign;
-  if (params.tags) filters.tags = params.tags.split(',').map((t) => t.trim());
-  if (params.limit) filters.limit = parseInt(params.limit, 10);
+  if (params.tags)     filters.tags = params.tags.split(',').map((t) => t.trim());
+  if (params.limit)    filters.limit = parseInt(params.limit, 10);
 
   const cacheKey = `${listingName}:${JSON.stringify(filters)}`;
   const cached = getCached(cacheKey);
