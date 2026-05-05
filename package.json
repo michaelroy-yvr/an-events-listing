@@ -1,0 +1,15 @@
+{
+  "name": "an-events-listing",
+  "version": "1.0.0",
+  "description": "Embeddable events listing widget for Action Network",
+  "main": "scripts/fetch-events.js",
+  "scripts": {
+    "fetch": "node --env-file=.env scripts/fetch-events.js",
+    "fetch:all": "node --env-file=.env scripts/fetch-events.js --all"
+  },
+  "dependencies": {},
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "type": "module"
+}

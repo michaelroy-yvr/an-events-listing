@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Events</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<header class="events-header">
+  <h1 class="events-title" id="listing-title">Upcoming Events</h1>
+  <p class="events-meta" id="listing-meta"></p>
+</header>
+
+<main id="events-root">
+  <div class="state-loading" aria-live="polite">Loading events…</div>
+</main>
+
+<footer class="events-footer">
+  Powered by <a href="https://actionnetwork.org" target="_blank" rel="noopener">Action Network</a>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  // ── Clock icons (inline SVG, no external deps) ───────────────────────────
+  const ICON_CLOCK = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1Zm0 1.5a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11ZM7.25 4v4.31l2.72 2.72.99-.99L8.75 7.94V4h-1.5Z"/></svg>`;
+  const ICON_PIN   = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 1a4.5 4.5 0 0 0-4.5 4.5c0 3.15 4.5 9.5 4.5 9.5s4.5-6.35 4.5-9.5A4.5 4.5 0 0 0 8 1Zm0 6.5a2 2 0 1 1 0-4 2 2 0 0 1 0 4Z"/></svg>`;
+
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  // ── Config from URL params ────────────────────────────────────────────────
+  const params  = new URLSearchParams(window.location.search);
+  const listing = params.get('listing') || 'all-upcoming';
+  const tags    = params.get('tags')    || '';
+  const limit   = params.get('limit')   || '';
+  const campaign= params.get('campaign')|| '';
+
+  // ── Resolve API URL ───────────────────────────────────────────────────────
+  // In serverless mode: same origin /api/events
+  // In GitHub Pages mode: data/{listing}.json (static file)
+  const isGhPages = !!(window.location.pathname.match(/\.html$/) &&
+                       !window.location.hostname.includes('localhost') &&
+                       !window.location.hostname.includes('netlify') &&
+                       !window.location.hostname.includes('vercel'));
+
+  function buildApiUrl() {
+    if (isGhPages) {
+      return `../data/${encodeURIComponent(listing)}.json`;
+    }
+    const u = new URL('/api/events', window.location.origin);
+    u.searchParams.set('listing', listing);
+    if (tags)     u.searchParams.set('tags', tags);
+    if (limit)    u.searchParams.set('limit', limit);
+    if (campaign) u.searchParams.set('campaign', campaign);
+    return u.toString();
+  }
+
+  // ── Render helpers ────────────────────────────────────────────────────────
+  function formatTime(isoStr) {
+    if (!isoStr) return null;
+    try {
+      const d = new Date(isoStr);
+      const weekday = d.toLocaleDateString([], { weekday: 'long' });
+      const time    = d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', timeZoneName: 'short' });
+      return `${weekday} at ${time}`;
+    } catch { return null; }
+  }
+
+  function dateBadge(isoStr) {
+    if (!isoStr) return '<div class="event-date-badge"><span class="month">TBD</span></div>';
+    const d = new Date(isoStr);
+    return `<div class="event-date-badge" aria-label="${d.toDateString()}">
+      <span class="month">${MONTHS[d.getMonth()]}</span>
+      <span class="day">${d.getDate()}</span>
+    </div>`;
+  }
+
+  function renderEvent(event) {
+    const time     = formatTime(event.start_date);
+    const location = event.location_virtual ? 'Virtual / Online' : (event.location || '');
+    const tagsHtml = (event.tags || []).length
+      ? `<div class="event-tags">${event.tags.map(t => `<span class="tag">${escHtml(t)}</span>`).join('')}</div>`
+      : '';
+
+    return `
+      <article class="event-card">
+        ${dateBadge(event.start_date)}
+        <div class="event-content">
+          <h2 class="event-title">${escHtml(event.title)}</h2>
+          ${time ? `<p class="event-time">${ICON_CLOCK} ${escHtml(time)}</p>` : ''}
+          ${location ? `<p class="event-location">${ICON_PIN} ${escHtml(location)}</p>` : ''}
+          ${tagsHtml}
+        </div>
+        <div class="event-actions">
+          ${event.rsvp_url
+            ? `<a class="btn-rsvp" href="${escAttr(event.rsvp_url)}" target="_blank" rel="noopener noreferrer">RSVP</a>`
+            : ''}
+        </div>
+      </article>`;
+  }
+
+  function escHtml(str) {
+    return String(str ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function escAttr(str) {
+    // Only allow http/https URLs
+    const s = String(str ?? '');
+    if (!/^https?:\/\//i.test(s)) return '#';
+    return escHtml(s);
+  }
+
+  // ── Fetch & render ────────────────────────────────────────────────────────
+  async function loadEvents() {
+    const root  = document.getElementById('events-root');
+    const title = document.getElementById('listing-title');
+    const meta  = document.getElementById('listing-meta');
+
+    try {
+      const res = await fetch(buildApiUrl());
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+
+      if (data.title) title.textContent = data.title;
+      if (data.updated_at) {
+        meta.textContent = `Last updated: ${new Date(data.updated_at).toLocaleString()}`;
+      }
+
+      const events = data.events ?? [];
+      if (events.length === 0) {
+        root.innerHTML = '<p class="state-empty">No upcoming events at this time. Check back soon!</p>';
+        return;
+      }
+
+      root.innerHTML = `<ul class="events-list" aria-label="Events list">${events.map(renderEvent).join('')}</ul>`;
+    } catch (err) {
+      console.error('Events embed error:', err);
+      root.innerHTML = '<p class="state-error">Unable to load events. Please try again later.</p>';
+    }
+  }
+
+  loadEvents();
+})();
+</script>
+</body>
+</html>
