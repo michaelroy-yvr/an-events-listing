@@ -83,6 +83,10 @@ function isFuture(event) {
   return new Date(startDate) >= today;
 }
 
+function isNotCancelled(event) {
+  return event.status !== 'cancelled';
+}
+
 /**
  * Return true if the event matches the given tags filter (AND logic).
  * Tags are stored in event.tags as an array of strings (or may be absent).
@@ -139,6 +143,7 @@ export async function fetchListing(apiKey, filters = {}) {
   const rawEvents = await fetchAllEvents(apiKey, campaignId);
 
   let events = rawEvents
+    .filter(isNotCancelled)
     .filter(isFuture)
     .filter((e) => matchesTags(e, tagFilter))
     .map(normalizeEvent)

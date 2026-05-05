@@ -8,18 +8,9 @@
 </head>
 <body>
 
-<header class="events-header">
-  <h1 class="events-title" id="listing-title">Upcoming Events</h1>
-  <p class="events-meta" id="listing-meta"></p>
-</header>
-
 <main id="events-root">
   <div class="state-loading" aria-live="polite">Loading events…</div>
 </main>
-
-<footer class="events-footer">
-  Powered by <a href="https://actionnetwork.org" target="_blank" rel="noopener">Action Network</a>
-</footer>
 
 <script>
 (function () {
@@ -119,19 +110,12 @@
 
   // ── Fetch & render ────────────────────────────────────────────────────────
   async function loadEvents() {
-    const root  = document.getElementById('events-root');
-    const title = document.getElementById('listing-title');
-    const meta  = document.getElementById('listing-meta');
+    const root = document.getElementById('events-root');
 
     try {
       const res = await fetch(buildApiUrl());
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
-
-      if (data.title) title.textContent = data.title;
-      if (data.updated_at) {
-        meta.textContent = `Last updated: ${new Date(data.updated_at).toLocaleString()}`;
-      }
 
       const events = data.events ?? [];
       if (events.length === 0) {

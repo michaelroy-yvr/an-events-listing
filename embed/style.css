@@ -1,7 +1,13 @@
 /* ────────────────────────────────────────────────────────────────
    AN Events Embed — style.css
    Designed for iframe embedding; fully self-contained.
+
+   FONT CONFIGURATION
+   Replace the kit ID below with your Adobe Fonts (Typekit) kit ID.
+   Find it at: https://fonts.adobe.com/my_fonts#web_projects-section
    ──────────────────────────────────────────────────────────────── */
+
+@import url("https://use.typekit.net/REPLACE_KIT_ID.css");
 
 *, *::before, *::after {
   box-sizing: border-box;
@@ -18,7 +24,7 @@
   --color-accent:    #d63727;   /* Action Network red */
   --color-accent-dk: #b82e20;
   --radius:          8px;
-  --font:            -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font:            "aileron", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 body {
