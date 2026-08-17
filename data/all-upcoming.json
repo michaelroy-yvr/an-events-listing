@@ -1,7 +1,7 @@
 {
   "listing": "all-upcoming",
   "title": "Upcoming Events",
-  "updated_at": "2026-08-17T21:04:34.739Z",
+  "updated_at": "2026-08-17T21:36:11.742Z",
   "events": [
     {
       "id": "action_network:b4b11241-1540-4cb9-b518-6ec5872bb6e2",
@@ -14,7 +14,7 @@
       "rsvp_url": "https://actionnetwork.org/events/bca-campaign-kick-off-party",
       "tags": [],
       "capacity": null,
-      "total_accepted": 15
+      "total_accepted": 16
     }
   ]
 }
