@@ -1,21 +1,8 @@
 {
   "listing": "all-upcoming",
   "title": "Upcoming Events",
-  "updated_at": "2026-08-22T00:00:45.014Z",
+  "updated_at": "2026-08-22T01:44:49.642Z",
   "events": [
-    {
-      "id": "action_network:a08d1ba7-e4df-4ff4-8c59-9897bb5679ca",
-      "title": "Christmas In August",
-      "start_date": "2026-08-25T15:00:00Z",
-      "end_date": "2026-08-25T23:45:00Z",
-      "location": "BCA Campaign Office, 2271 Rosser, Burnaby, BC",
-      "location_virtual": false,
-      "description": "<p>Ipsem Lorem ASS event description</p>",
-      "rsvp_url": "https://actionnetwork.org/events/christmas-in-august",
-      "tags": [],
-      "capacity": 200,
-      "total_accepted": 1
-    },
     {
       "id": "action_network:b4b11241-1540-4cb9-b518-6ec5872bb6e2",
       "title": "BCA Campaign Kick-Off Party",
