@@ -1,7 +1,7 @@
 {
   "listing": "all-upcoming",
   "title": "Upcoming Events",
-  "updated_at": "2026-08-22T18:30:51.292Z",
+  "updated_at": "2026-08-22T19:00:18.160Z",
   "events": [
     {
       "id": "action_network:b4b11241-1540-4cb9-b518-6ec5872bb6e2",
@@ -15,32 +15,6 @@
       "tags": [],
       "capacity": null,
       "total_accepted": 45
-    },
-    {
-      "id": "action_network:5b600808-2975-459a-9071-083b4bd1d83d",
-      "title": "Rally for Burnaby",
-      "start_date": "2026-08-31T13:00:00Z",
-      "end_date": null,
-      "location": "BCA Campaign Office, 2271 Rosser, Burnaby, BC",
-      "location_virtual": false,
-      "description": "<p>Join us as we kick off the campaign with a rally.</p>",
-      "rsvp_url": "https://actionnetwork.org/events/rally-for-burnaby",
-      "tags": [],
-      "capacity": 20,
-      "total_accepted": 1
-    },
-    {
-      "id": "action_network:8cf19267-b922-4e98-8619-1e2e2b1eddba",
-      "title": "Volunteer Appreciation Party",
-      "start_date": "2026-11-14T18:00:00Z",
-      "end_date": null,
-      "location": "Campaign Office, 2271 Rosser Ave, Burnaby, BC",
-      "location_virtual": false,
-      "description": "<p>An appreciation event for volunteers</p>",
-      "rsvp_url": "https://actionnetwork.org/events/volunteer-appreciation-party-11",
-      "tags": [],
-      "capacity": 150,
-      "total_accepted": 1
     }
   ]
 }
